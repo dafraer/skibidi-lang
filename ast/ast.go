@@ -53,7 +53,7 @@ type Identifier struct {
 	Value string
 }
 
-// Important useless dummy methods for making structs implement interfaces
+// Important useless dummy methods that make  structs implement interfaces
 func (i *Identifier) expressionNode()                {}
 func (i *Identifier) TokenLiteral() string           { return i.Token.Literal }
 func (rs *ReturnStatement) statementNode()           {}
