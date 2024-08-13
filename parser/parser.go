@@ -60,6 +60,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.prefixParseFns[token.INT] = prefixParseFn(p.parseInteger)
 	p.prefixParseFns[token.NOT] = prefixParseFn(p.parsePrefixExpression)
 	p.prefixParseFns[token.SUB] = prefixParseFn(p.parsePrefixExpression)
+	p.prefixParseFns[token.LPAREN] = prefixParseFn(p.parseGroupedExpression)
 	p.infixParseFns[token.ADD] = infixParseFn(p.parseInfixExpression)
 	p.infixParseFns[token.SUB] = infixParseFn(p.parseInfixExpression)
 	p.infixParseFns[token.NOT] = infixParseFn(p.parseInfixExpression)
@@ -211,6 +212,15 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	p.nextToken()
 	expression.Right = p.parseExpression(precedence)
 	return expression
+}
+
+func (p *Parser) parseGroupedExpression() ast.Expression {
+	p.nextToken()
+	exp := p.parseExpression(lowest)
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	return exp
 }
 
 func (p *Parser) curTokenIs(t token.TokenType) bool {
