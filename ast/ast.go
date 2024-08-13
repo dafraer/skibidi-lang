@@ -44,7 +44,7 @@ type ReturnStatement struct {
 }
 
 type ExpressionStatement struct {
-	Token      token.Token
+	Token      token.Token //the first token of the expression
 	Expression Expression
 }
 
@@ -53,7 +53,37 @@ type Identifier struct {
 	Value string
 }
 
+type IntegerLiteral struct {
+	Token token.Token
+	Value int64
+}
+
+type Boolean struct {
+	Token token.Token
+	Value bool
+}
+
+type PrefixExpression struct {
+	Token    token.Token
+	Operator string
+	Right    Expression
+}
+type InfixExpression struct {
+	Token    token.Token // The operator token, e.g. +
+	Left     Expression
+	Operator string
+	Right    Expression
+}
+
 // Important useless dummy methods that make  structs implement interfaces
+func (b *Boolean) expressionNode()                   {}
+func (b *Boolean) TokenLiteral() string              { return b.Token.Literal }
+func (b *Boolean) String() string                    { return b.Token.Literal }
+func (oe *InfixExpression) expressionNode()          {}
+func (oe *InfixExpression) TokenLiteral() string     { return oe.Token.Literal }
+func (il *IntegerLiteral) expressionNode()           {}
+func (il *IntegerLiteral) TokenLiteral() string      { return il.Token.Literal }
+func (il *IntegerLiteral) String() string            { return il.Token.Literal }
 func (i *Identifier) expressionNode()                {}
 func (i *Identifier) TokenLiteral() string           { return i.Token.Literal }
 func (rs *ReturnStatement) statementNode()           {}
@@ -62,8 +92,28 @@ func (ls *LetStatement) statementNode()              {}
 func (ls *LetStatement) TokenLiteral() string        { return ls.Token.Literal }
 func (es *ExpressionStatement) statementNode()       {}
 func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
+func (pe *PrefixExpression) expressionNode()         {}
+func (pe *PrefixExpression) TokenLiteral() string    { return pe.Token.Literal }
 
 // String methods
+func (oe *InfixExpression) String() string {
+	var out bytes.Buffer
+	out.WriteString("(")
+	out.WriteString(oe.Left.String())
+	out.WriteString(" " + oe.Operator + " ")
+	out.WriteString(oe.Right.String())
+	out.WriteString(")")
+	return out.String()
+}
+func (pe *PrefixExpression) String() string {
+	var out bytes.Buffer
+	out.WriteString("(")
+	out.WriteString(pe.Operator)
+	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+	return out.String()
+}
+
 func (p *Program) String() string {
 	var out bytes.Buffer
 	for _, s := range p.Statements {
